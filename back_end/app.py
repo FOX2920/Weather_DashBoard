@@ -1,6 +1,6 @@
 import os
 import requests
-import google.generativeai as genai
+# import google.generativeai as genai
 import smtplib
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
