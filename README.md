@@ -21,10 +21,10 @@ This project is a weather dashboard application that allows users to search for 
 
 ```
 Weather-dashboard/
-├── backend/
+├── back_end/
 │   ├── app.py
 │   ├── requirements.txt
-├── frontend/
+├── front end/
 │   ├── build/
 │   ├── package.json
 │   ├── src/
