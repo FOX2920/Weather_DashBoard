@@ -7,9 +7,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configuration
-genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+#genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT'))
@@ -82,7 +86,15 @@ def get_weather_report():
     weather_data = fetch_weather_data(API_KEY, city)
     
     if weather_data:
-        email_content = generate_weather_email_gemini(city, weather_data)
+        # Create a simple text email content
+        email_content = f"""
+        Weather Report for {city}
+        
+        Today's Weather:
+        - Average Temperature: {weather_data['avg_temperature']}°C
+        - Wind Speed: {weather_data['wind_speed']} m/s
+        - Humidity: {weather_data['humidity']}%
+        """
         send_email(email, f"Weather Report for {city}", email_content)
         return jsonify({'message': 'Email sent successfully'})
     else:
