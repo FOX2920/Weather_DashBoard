@@ -7,10 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
 
 # Configuration
 #genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
