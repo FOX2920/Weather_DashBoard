@@ -7,8 +7,6 @@ This project is a weather dashboard application that allows users to search for 
 
 ## Features
 
-### Must Have
-
 - **API Processing**: All API calls and processing are handled on the backend using Python.
 - **Search Functionality**: Users can search for a city or country to view weather information.
   - **Current Weather**: Displays temperature, wind speed, humidity, and other relevant weather details for the present day.
@@ -109,7 +107,9 @@ Deploy the contents of the `build` directory to your preferred hosting service (
 3. Make your changes.
 4. Submit a pull request.
 
+## Demo
 
+Check out the live demo in this [link](https://weather-dash-board-nine.vercel.app/).
 
 ## Contact
 
