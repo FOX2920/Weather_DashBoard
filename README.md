@@ -17,11 +17,6 @@ This project is a weather dashboard application that allows users to search for 
 - **Email Notifications**: Users can register and unsubscribe to receive daily weather forecast information via email. Email confirmation is required.
 - **Deployment**: The application is deployed and live.
 
-### Nice to Have
-
-- **Responsive Design**: The application looks good on all devices, including desktops, tablets, and mobile phones.
-- **Smooth Animations**: The user interface includes smooth animations to enhance the user experience.
-
 ## Project Structure
 
 ```
@@ -118,5 +113,6 @@ Deploy the contents of the `build` directory to your preferred hosting service (
 
 ## Contact
 
-For any questions or suggestions, please reach out to me here [Your Contact Information].
+For any questions or suggestions, please reach out to me [here](mailto:21522557@gm.edu.vn)
+.
 
