@@ -42,22 +42,22 @@ def fetch_weather_data(api_key, city):
         print("Failed to retrieve current weather data:", current_data)
         return None
 
-def generate_weather_email_gemini(city, weather_data):
-    prompt = f"""
-    You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
+# def generate_weather_email_gemini(city, weather_data):
+#     prompt = f"""
+#     You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
 
-    Here is the weather data for {city}:
+#     Here is the weather data for {city}:
 
-    Today's Weather:
-    - Average Temperature: {weather_data['avg_temperature']}°C
-    - Wind Speed: {weather_data['wind_speed']} m/s
-    - Humidity: {weather_data['humidity']}%
+#     Today's Weather:
+#     - Average Temperature: {weather_data['avg_temperature']}°C
+#     - Wind Speed: {weather_data['wind_speed']} m/s
+#     - Humidity: {weather_data['humidity']}%
 
-    Please provide a detailed and friendly email based on the above data.
-    """
-    model = genai.GenerativeModel('gemini-pro')
-    response = model.generate_content(prompt)
-    return response.text
+#     Please provide a detailed and friendly email based on the above data.
+#     """
+#     model = genai.GenerativeModel('gemini-pro')
+#     response = model.generate_content(prompt)
+#     return response.text
 
 def send_email(to_email, subject, body):
     msg = MIMEMultipart()
