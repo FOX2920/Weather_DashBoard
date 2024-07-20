@@ -1,6 +1,6 @@
 secure-smtplib
 Flask
+Flask-Cors
+python-dotenv
 requests
 gunicorn
-python-dotenv
-Flask-Cors
