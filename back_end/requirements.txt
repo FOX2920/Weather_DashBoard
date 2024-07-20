@@ -1,4 +1,5 @@
 secure-smtplib
 Flask
 requests
+gunicorn
 Flask-Cors
