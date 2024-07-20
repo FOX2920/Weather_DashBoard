@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API_BASE_URL = "http://localhost:8080"; // Đã được định nghĩa đúng
+const API_BASE_URL = "https://weather-dashboard-7a4a.onrender.com"; // Đã được định nghĩa đúng
 
 function EmailSubscription() {
     const [email, setEmail] = useState('');
