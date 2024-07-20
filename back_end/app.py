@@ -11,11 +11,11 @@ from flask_cors import CORS
 
 # Configuration
 #genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-API_KEY = os.getenv('OPENWEATHER_API_KEY')
-SMTP_SERVER = os.getenv('SMTP_SERVER')
-SMTP_PORT = int(os.getenv('SMTP_PORT'))
-EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
-EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+API_KEY = os.environ.get('OPENWEATHER_API_KEY')
+SMTP_SERVER = os.environ.get('SMTP_SERVER')
+SMTP_PORT = int(os.environ.get('SMTP_PORT'))
+EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
 app = Flask(__name__)
 CORS(app)
