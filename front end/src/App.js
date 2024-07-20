@@ -5,7 +5,7 @@ import Forecast from './components/Forecast';
 import EmailSubscription from './components/EmailSubscription';
 import './App.css';
 
-const API_BASE_URL = "http://localhost:8080"; // Update this if your backend is hosted elsewhere
+const API_BASE_URL = "https://weather-dashboard-7a4a.onrender.com"; // Update this if your backend is hosted elsewhere
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
