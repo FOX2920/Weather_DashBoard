@@ -1,0 +1,19 @@
+services:
+- type: web
+  name: weather-backend
+  env: python
+  plan: free
+  region: oregon
+  buildCommand: "pip install -r requirements.txt"
+  startCommand: "gunicorn app:app"
+  envVars:
+  - key: OPENWEATHER_API_KEY
+    sync: true
+  - key: SMTP_SERVER
+    sync: true
+  - key: SMTP_PORT
+    sync: true
+  - key: EMAIL_ADDRESS
+    sync: true
+  - key: EMAIL_PASSWORD
+    sync: true
