@@ -9,10 +9,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-
-# Load environment variables from .env file
 load_dotenv()
-
 # Configuration
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 SMTP_SERVER = os.getenv('SMTP_SERVER')
