@@ -7,15 +7,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
 
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configuration
-#genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-API_KEY = os.environ.get('OPENWEATHER_API_KEY')
-SMTP_SERVER = os.environ.get('SMTP_SERVER')
-SMTP_PORT = int(os.environ.get('SMTP_PORT'))
-EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
-EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+API_KEY = os.getenv('OPENWEATHER_API_KEY')
+SMTP_SERVER = os.getenv('SMTP_SERVER')
+SMTP_PORT = int(os.getenv('SMTP_PORT'))
+EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 app = Flask(__name__)
 CORS(app)
@@ -162,3 +165,6 @@ def reverse_geocode():
         return jsonify({"error": "Location not found"}), 404
 
     return jsonify({"name": data[0]['name']})
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', debug=True, use_reloader=False)
