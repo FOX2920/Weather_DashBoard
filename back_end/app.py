@@ -162,7 +162,3 @@ def reverse_geocode():
         return jsonify({"error": "Location not found"}), 404
 
     return jsonify({"name": data[0]['name']})
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
