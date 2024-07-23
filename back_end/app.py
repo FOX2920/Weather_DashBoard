@@ -8,6 +8,8 @@ from email.mime.text import MIMEText
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+import random
+import string
 
 load_dotenv()
 # Configuration
@@ -19,6 +21,11 @@ EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 app = Flask(__name__)
 CORS(app)
+
+subscriptions = {}
+
+def generate_confirmation_code(length=6):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 def fetch_weather_data(api_key, city):
     current_url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
@@ -96,6 +103,28 @@ def get_weather_report():
         return jsonify({'message': 'Email sent successfully'})
     else:
         return jsonify({'error': 'Failed to retrieve weather data'}), 500
+
+
+@app.route('/confirm_subscription', methods=['POST'])
+def confirm_subscription():
+    data = request.get_json()
+    email = data.get('email')
+    confirmation_code = data.get('confirmation_code')
+
+    if email in subscriptions and subscriptions[email]['confirmation_code'] == confirmation_code:
+        subscriptions[email]['confirmed'] = True
+        return jsonify({'message': 'Subscription confirmed successfully'})
+    else:
+        return jsonify({'error': 'Invalid email or confirmation code'}), 400
+
+@app.route('/unsubscribe', methods=['DELETE'])
+def unsubscribe():
+    email = request.args.get('email')
+    if email in subscriptions:
+        del subscriptions[email]
+        return jsonify({'message': 'Unsubscribed successfully'})
+    else:
+        return jsonify({'error': 'Email not found in subscriptions'}), 400
 
 @app.route('/api/weather', methods=['GET'])
 def get_weather():
