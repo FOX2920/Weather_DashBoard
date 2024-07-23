@@ -1,6 +1,6 @@
 import os
 import requests
-# import google.generativeai as genai
+import google.generativeai as genai
 import smtplib
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
@@ -8,11 +8,12 @@ from email.mime.text import MIMEText
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-import random
-import string
 
+# Load environment variables from .env file
 load_dotenv()
+
 # Configuration
+genai.configure(api_key='AIzaSyAw2CY3ON0ksUX-JElqJG2GbRGJ2jWMz0Y') #GOOGLE_API_KEY
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT'))
@@ -21,11 +22,6 @@ EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 app = Flask(__name__)
 CORS(app)
-
-subscriptions = {}
-
-def generate_confirmation_code(length=6):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 def fetch_weather_data(api_key, city):
     current_url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
@@ -46,22 +42,22 @@ def fetch_weather_data(api_key, city):
         print("Failed to retrieve current weather data:", current_data)
         return None
 
-# def generate_weather_email_gemini(city, weather_data):
-#     prompt = f"""
-#     You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
+def generate_weather_email_gemini(city, weather_data):
+    prompt = f"""
+    You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
 
-#     Here is the weather data for {city}:
+    Here is the weather data for {city}:
 
-#     Today's Weather:
-#     - Average Temperature: {weather_data['avg_temperature']}°C
-#     - Wind Speed: {weather_data['wind_speed']} m/s
-#     - Humidity: {weather_data['humidity']}%
+    Today's Weather:
+    - Average Temperature: {weather_data['avg_temperature']}°C
+    - Wind Speed: {weather_data['wind_speed']} m/s
+    - Humidity: {weather_data['humidity']}%
 
-#     Please provide a detailed and friendly email based on the above data.
-#     """
-#     model = genai.GenerativeModel('gemini-pro')
-#     response = model.generate_content(prompt)
-#     return response.text
+    Please provide a detailed and friendly email based on the above data.
+    """
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(prompt)
+    return response.text
 
 def send_email(to_email, subject, body):
     msg = MIMEMultipart()
@@ -90,41 +86,11 @@ def get_weather_report():
     weather_data = fetch_weather_data(API_KEY, city)
     
     if weather_data:
-        # Create a simple text email content
-        email_content = f"""
-        Weather Report for {city}
-        
-        Today's Weather:
-        - Average Temperature: {weather_data['avg_temperature']}°C
-        - Wind Speed: {weather_data['wind_speed']} m/s
-        - Humidity: {weather_data['humidity']}%
-        """
+        email_content = generate_weather_email_gemini(city, weather_data)
         send_email(email, f"Weather Report for {city}", email_content)
         return jsonify({'message': 'Email sent successfully'})
     else:
         return jsonify({'error': 'Failed to retrieve weather data'}), 500
-
-
-@app.route('/confirm_subscription', methods=['POST'])
-def confirm_subscription():
-    data = request.get_json()
-    email = data.get('email')
-    confirmation_code = data.get('confirmation_code')
-
-    if email in subscriptions and subscriptions[email]['confirmation_code'] == confirmation_code:
-        subscriptions[email]['confirmed'] = True
-        return jsonify({'message': 'Subscription confirmed successfully'})
-    else:
-        return jsonify({'error': 'Invalid email or confirmation code'}), 400
-
-@app.route('/unsubscribe', methods=['DELETE'])
-def unsubscribe():
-    email = request.args.get('email')
-    if email in subscriptions:
-        del subscriptions[email]
-        return jsonify({'message': 'Unsubscribed successfully'})
-    else:
-        return jsonify({'error': 'Email not found in subscriptions'}), 400
 
 @app.route('/api/weather', methods=['GET'])
 def get_weather():
@@ -193,4 +159,4 @@ def reverse_geocode():
     return jsonify({"name": data[0]['name']})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True, use_reloader=False)
+    app.run(debug=True, port=8080, use_reloader=False)
