@@ -56,21 +56,26 @@ def fetch_weather_data(api_key, city):
 #     response = model.generate_content(prompt)
 #     return response.text
 
-def send_email(to_email, subject, body):
+def send_email(to_email, subject, body, is_html=False):
     msg = MIMEMultipart()
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = to_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
+
+    if is_html:
+        msg.attach(MIMEText(body, 'html'))
+    else:
+        msg.attach(MIMEText(body, 'plain'))
+        
     try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.send_message(msg)
-        server.quit()
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.send_message(msg)
         print(f"Email sent to {to_email}")
     except Exception as e:
         print(f"Failed to send email: {e}")
+
 @app.route('/weather_mail', methods=['GET'])
 def get_weather_report():
     city = request.args.get('city')
@@ -81,16 +86,23 @@ def get_weather_report():
     weather_data = fetch_weather_data(API_KEY, city)
     
     if weather_data:
-        # Create a simple text email content
         email_content = f"""
-        Weather Report for {city}
-        
-        Today's Weather:
-        - Average Temperature: {weather_data['avg_temperature']}°C
-        - Wind Speed: {weather_data['wind_speed']} m/s
-        - Humidity: {weather_data['humidity']}%
+        <html>
+        <body>
+        <h2>Weather Report for {city}</h2>
+        <p>Today's Weather:</p>
+        <ul>
+            <li>Average Temperature: {weather_data['avg_temperature']}°C</li>
+            <li>Wind Speed: {weather_data['wind_speed']} m/s</li>
+            <li>Humidity: {weather_data['humidity']}%</li>
+        </ul>
+        </body>
+        </html>
         """
-        send_email(email, f"Weather Report for {city}", email_content)
+        send_email(email, f"Weather Report for {city}", email_content, is_html=True)
+        return jsonify({'message': 'Email sent successfully'})
+    else:
+        return jsonify({'error': 'Failed to retrieve weather data'}), 500
 
 @app.route('/api/weather', methods=['GET'])
 def get_weather():
