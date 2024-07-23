@@ -1,6 +1,6 @@
 import os
 import requests
-import google.generativeai as genai
+#import google.generativeai as genai
 import smtplib
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
-genai.configure(api_key=os.getenv('GOOGLE_API_KEY')) #GOOGLE_API_KEY
+#genai.configure(api_key=os.getenv('GOOGLE_API_KEY')) #GOOGLE_API_KEY
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT'))
@@ -42,22 +42,19 @@ def fetch_weather_data(api_key, city):
         print("Failed to retrieve current weather data:", current_data)
         return None
 
-def generate_weather_email_gemini(city, weather_data):
-    prompt = f"""
-    You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
-
-    Here is the weather data for {city}:
-
-    Today's Weather:
-    - Average Temperature: {weather_data['avg_temperature']}°C
-    - Wind Speed: {weather_data['wind_speed']} m/s
-    - Humidity: {weather_data['humidity']}%
-
-    Please provide a detailed and friendly email based on the above data.
-    """
-    model = genai.GenerativeModel('gemini-pro')
-    response = model.generate_content(prompt)
-    return response.text
+# def generate_weather_email_gemini(city, weather_data):
+#     prompt = f"""
+#     You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
+#     Here is the weather data for {city}:
+#     Today's Weather:
+#     - Average Temperature: {weather_data['avg_temperature']}°C
+#     - Wind Speed: {weather_data['wind_speed']} m/s
+#     - Humidity: {weather_data['humidity']}%
+#     Please provide a detailed and friendly email based on the above data.
+#     """
+#     model = genai.GenerativeModel('gemini-pro')
+#     response = model.generate_content(prompt)
+#     return response.text
 
 def send_email(to_email, subject, body):
     msg = MIMEMultipart()
@@ -65,7 +62,6 @@ def send_email(to_email, subject, body):
     msg['To'] = to_email
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'plain'))
-
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
@@ -75,7 +71,6 @@ def send_email(to_email, subject, body):
         print(f"Email sent to {to_email}")
     except Exception as e:
         print(f"Failed to send email: {e}")
-
 @app.route('/weather_mail', methods=['GET'])
 def get_weather_report():
     city = request.args.get('city')
@@ -86,11 +81,16 @@ def get_weather_report():
     weather_data = fetch_weather_data(API_KEY, city)
     
     if weather_data:
-        email_content = generate_weather_email_gemini(city, weather_data)
+        # Create a simple text email content
+        email_content = f"""
+        Weather Report for {city}
+        
+        Today's Weather:
+        - Average Temperature: {weather_data['avg_temperature']}°C
+        - Wind Speed: {weather_data['wind_speed']} m/s
+        - Humidity: {weather_data['humidity']}%
+        """
         send_email(email, f"Weather Report for {city}", email_content)
-        return jsonify({'message': 'Email sent successfully'})
-    else:
-        return jsonify({'error': 'Failed to retrieve weather data'}), 500
 
 @app.route('/api/weather', methods=['GET'])
 def get_weather():
