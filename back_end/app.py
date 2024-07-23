@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
-genai.configure(api_key='AIzaSyAw2CY3ON0ksUX-JElqJG2GbRGJ2jWMz0Y') #GOOGLE_API_KEY
+genai.configure(api_key=os.getenv('GOOGLE_API_KEY')) #GOOGLE_API_KEY
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT'))
