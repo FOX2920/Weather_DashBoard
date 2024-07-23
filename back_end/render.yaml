@@ -7,6 +7,8 @@ services:
   buildCommand: "pip install -r requirements.txt"
   startCommand: "gunicorn app:app"
   envVars:
+  - key: GOOGLE_API_KEY
+    sync: true
   - key: OPENWEATHER_API_KEY
     sync: true
   - key: SMTP_SERVER
