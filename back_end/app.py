@@ -1,6 +1,6 @@
 import os
 import requests
-# import google.generativeai as genai
+import google.generativeai as genai
 import smtplib
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
@@ -14,13 +14,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuration
+genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT'))
 EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+
 app = Flask(__name__)
 CORS(app)
+
 def fetch_weather_data(api_key, city):
     current_url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
     current_response = requests.get(current_url)
@@ -38,19 +41,20 @@ def fetch_weather_data(api_key, city):
     else:
         print("Failed to retrieve current weather data:", current_data)
         return None
-# def generate_weather_email_gemini(city, weather_data):
-#     prompt = f"""
-#     You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
-#     Here is the weather data for {city}:
-#     Today's Weather:
-#     - Average Temperature: {weather_data['avg_temperature']}°C
-#     - Wind Speed: {weather_data['wind_speed']} m/s
-#     - Humidity: {weather_data['humidity']}%
-#     Please provide a detailed and friendly email based on the above data.
-#     """
-#     model = genai.GenerativeModel('gemini-pro')
-#     response = model.generate_content(prompt)
-#     return response.text
+def generate_weather_email_gemini(city, weather_data):
+    prompt = f"""
+    You are a weather assistant. Your task is to write a detailed and friendly weather update email based on the provided weather data.
+    Here is the weather data for {city}:
+    Today's Weather:
+    - Average Temperature: {weather_data['avg_temperature']}°C
+    - Wind Speed: {weather_data['wind_speed']} m/s
+    - Humidity: {weather_data['humidity']}%
+    Please provide a detailed and friendly email based on the above data.No need for subject
+    """
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(prompt)
+    return response.text
+
 def send_email(to_email, subject, body):
     msg = MIMEMultipart()
     msg['From'] = EMAIL_ADDRESS
@@ -66,6 +70,7 @@ def send_email(to_email, subject, body):
         print(f"Email sent to {to_email}")
     except Exception as e:
         print(f"Failed to send email: {e}")
+
 @app.route('/weather_mail', methods=['GET'])
 def get_weather_report():
     city = request.args.get('city')
@@ -77,15 +82,9 @@ def get_weather_report():
     
     if weather_data:
         # Create a simple text email content
-        email_content = f"""
-        Weather Report for {city}
-        
-        Today's Weather:
-        - Average Temperature: {weather_data['avg_temperature']}°C
-        - Wind Speed: {weather_data['wind_speed']} m/s
-        - Humidity: {weather_data['humidity']}%
-        """
+        email_content = email_content = generate_weather_email_gemini(city, weather_data)
         send_email(email, f"Weather Report for {city}", email_content)
+        
         return jsonify({'message': 'Email sent successfully'})
     else:
         return jsonify({'error': 'Failed to retrieve weather data'}), 500
