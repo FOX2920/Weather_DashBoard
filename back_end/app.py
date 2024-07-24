@@ -8,7 +8,7 @@ from email.mime.text import MIMEText
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-
+import markdown
 
 # Load environment variables from .env file
 load_dotenv()
@@ -50,18 +50,30 @@ def generate_weather_email_gemini(city, weather_data):
     - Average Temperature: {weather_data['avg_temperature']}°C
     - Wind Speed: {weather_data['wind_speed']} m/s
     - Humidity: {weather_data['humidity']}%
-    Please provide a detailed and friendly email based on the above data. No need for subject. No bold text.
+    Please provide a detailed and friendly email based on the above data. No need for subject. Use markdown for formatting, where *text* should be used for bold text.
     """
     model = genai.GenerativeModel('gemini-pro')
     response = model.generate_content(prompt)
     return response.text
+
+def generate_email_subject_gemini(city):
+    prompt = f"""
+    You are a weather assistant. Your task is to create a friendly and engaging subject line for an email that provides a weather update for {city}.
+    """
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content(prompt)
+    return response.text.strip()
 
 def send_email(to_email, subject, body):
     msg = MIMEMultipart()
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = to_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'html'))
+    
+    # Chuyển đổi markdown thành HTML
+    html_body = markdown.markdown(body)
+    
+    msg.attach(MIMEText(html_body, 'html'))
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
@@ -82,11 +94,13 @@ def get_weather_report():
     weather_data = fetch_weather_data(API_KEY, city)
     
     if weather_data:
-        # Create a simple text email content
-        email_content = email_content = generate_weather_email_gemini(city, weather_data)
-        send_email(email, f"Weather Report for {city}", email_content)
+        email_subject = generate_email_subject_gemini(city)
+        email_content = generate_weather_email_gemini(city, weather_data)
+        send_email(email, email_subject, email_content)
         
-        return jsonify({'message': 'Email sent successfully'})
+        return jsonify({'message': 'Email sent successfully', 'email_subject': email_subject, 'email_content': email_content})
+    else:
+        return jsonify({'error': 'Failed to retrieve weather data'}), 500
     else:
         return jsonify({'error': 'Failed to retrieve weather data'}), 500
 @app.route('/api/weather', methods=['GET'])
