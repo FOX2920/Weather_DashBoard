@@ -5,5 +5,4 @@ python-dotenv
 google-generativeai
 requests
 gunicorn
-markdown2 
-beautifulsoup4
+Markdown
