@@ -101,8 +101,7 @@ def get_weather_report():
         return jsonify({'message': 'Email sent successfully', 'email_subject': email_subject, 'email_content': email_content})
     else:
         return jsonify({'error': 'Failed to retrieve weather data'}), 500
-    else:
-        return jsonify({'error': 'Failed to retrieve weather data'}), 500
+
 @app.route('/api/weather', methods=['GET'])
 def get_weather():
     latitude = request.args.get('lat')
