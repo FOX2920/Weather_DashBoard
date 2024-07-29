@@ -1,8 +1,6 @@
-secure-smtplib
 Flask
 Flask-Cors
 python-dotenv
 google-generativeai
 requests
 gunicorn
-Markdown
